@@ -1,24 +1,11 @@
-name: Job Matching
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
-on:
-  schedule:
-    - cron: '0 */6 * * *'
-  workflow_dispatch:
+resume = open("Sateesh_Meena_ATS_Resume.docx").read()
+job = open("job_description.txt").read()
 
-jobs:
-  match-jobs:
-    runs-on: ubuntu-latest
+vec = TfidfVectorizer()
+matrix = vec.fit_transform([resume, job])
 
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Run matcher
-        run: python match_jobs.py
+score = cosine_similarity(matrix[0], matrix[1])[0][0]
+print(f"Match Score: {score:.2%}")
